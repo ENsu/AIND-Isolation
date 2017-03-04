@@ -251,8 +251,33 @@ class CustomPlayer:
                 to pass the project unit tests; you cannot call any other
                 evaluation function directly.
         """
-        if self.time_left() < self.TIMER_THRESHOLD:
-            raise Timeout()
+        player_scored = game.active_player if maximizing_player else game.inactive_player
+        legal_moves = game.get_legal_moves(game.active_player)
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # print("---" * 10)
+        # print("at level {}".format(depth))
+        # print("my current position: {}".format(game.get_player_location(player_scored)))
+        # print("opponent current position: {}".format(game.get_player_location(opponent)))
+        # print("num of legal_moves {}".format(len(legal_moves)))
+        # print("legal moves {}".format(legal_moves))
+
+        if depth == 0:
+            return self.score(game, player_scored)
+
+        else:
+            best_move = legal_moves[0]
+            new_game = game.forecast_move(best_move)
+            best_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+
+            for current_move in legal_moves[1:]:
+
+                if self.time_left() < self.TIMER_THRESHOLD:
+                    raise Timeout()
+
+                new_game = game.forecast_move(current_move)
+                current_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+                if (current_val > best_val) == maximizing_player:
+                    best_val = current_val
+                    best_move = current_move
+
+        return (best_val, best_move)
