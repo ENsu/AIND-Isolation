@@ -116,7 +116,7 @@ class CustomPlayer:
         """
 
         self.time_left = time_left
-        legal_moves = game.get_legal_moves()
+        depth_list = range(1, len(game.get_blank_spaces())) if self.iterative else [self.search_depth]
 
         # TODO: finish this function!
 
@@ -124,23 +124,21 @@ class CustomPlayer:
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
 
-        best_move = legal_moves[0]
-        new_game = game.forecast_move(best_move)
-        best_val = self.minimax(new_game, self.search_depth-1, maximizing_player=False)
-
         try:
-            for l in legal_moves[1:]:
-                new_game = game.forecast_move(l)
-                current_val = self.minimax(new_game, self.search_depth-1, maximizing_player=False)
-                if current_val > best_val:
-                    best_move = l
-                    best_val = current_val
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
+            for depth in depth_list:
+                if self.method == "minimax":
+                    bext_val, best_move = self.minimax(game, depth)
+                else:
+                    best_val, best_move = self.alphabeta(game, depth)
 
         except Timeout:
+            print("---" * 10)
+            print("don't we have the best move here?")
+            print(best_move)
             # Handle any actions required at timeout, if necessary
             return best_move
 
@@ -192,20 +190,24 @@ class CustomPlayer:
         # print("legal moves {}".format(legal_moves))
 
         if depth == 0:
-            return self.score(game, player_scored)
+            return (self.score(game, player_scored), (-1, -1))
+
+        elif len(legal_moves) == 0:
+            return (float("-inf"), (-1, -1))
 
         else:
             best_move = legal_moves[0]
             new_game = game.forecast_move(best_move)
-            best_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+            best_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
 
             for current_move in legal_moves[1:]:
 
                 if self.time_left() < self.TIMER_THRESHOLD:
+                    print("raise Timeout()")
                     raise Timeout()
 
                 new_game = game.forecast_move(current_move)
-                current_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+                current_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
                 if (current_val > best_val) == maximizing_player:
                     best_val = current_val
                     best_move = current_move
@@ -252,6 +254,7 @@ class CustomPlayer:
                 evaluation function directly.
         """
         player_scored = game.active_player if maximizing_player else game.inactive_player
+        # opponent = game.get_opponent(player_scored)
         legal_moves = game.get_legal_moves(game.active_player)
 
         # print("---" * 10)
@@ -267,15 +270,27 @@ class CustomPlayer:
         else:
             best_move = legal_moves[0]
             new_game = game.forecast_move(best_move)
-            best_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+            best_val = self.alphabeta(new_game, depth-1, maximizing_player=(not maximizing_player))
 
             for current_move in legal_moves[1:]:
 
                 if self.time_left() < self.TIMER_THRESHOLD:
+                    print("RAISE TIMEOUT()")
                     raise Timeout()
 
+                if (maximizing_player and (best_val >= beta)) or (not maximizing_player and (best_val <= alpha)):
+                    break
+
+                if maximizing_player:
+                    alpha = best_val
+                    beta = float("inf")
+                    
+                else:
+                    beta = best_val
+                    alpha = float("-inf")
+
                 new_game = game.forecast_move(current_move)
-                current_val = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+                current_val = self.alphabeta(new_game, depth-1, alpha=alpha, beta=beta, maximizing_player=(not maximizing_player))
                 if (current_val > best_val) == maximizing_player:
                     best_val = current_val
                     best_move = current_move

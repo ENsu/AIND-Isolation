@@ -423,7 +423,7 @@ class Project1Test(unittest.TestCase):
                 method, test_depth, expected_moves[idx // 2], move))
 
     @timeout(20)
-    @unittest.skip("Skip alpha-beta test.")  # Uncomment this line to skip test
+    # @unittest.skip("Skip alpha-beta test.")  # Uncomment this line to skip test
     def test_alphabeta(self):
         """ Test CustomPlayer.alphabeta
 
@@ -450,7 +450,7 @@ class Project1Test(unittest.TestCase):
         # the search should still return an optimal move.
         counts = [(8, 8), (17, 10), (74, 42), (139, 51), (540, 119)]
 
-        for idx in range(len(counts)):
+        for idx in range(1):
             test_depth = idx + 1  # pruning guarantee requires min depth of 3
             first_branch = []
             heuristic = makeBranchEval(first_branch)
