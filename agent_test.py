@@ -399,7 +399,7 @@ class Project1Test(unittest.TestCase):
         # player (student agent) has the last move, while even depths mean that
         # the adversary has the last move before calling the heuristic
         # evaluation function.
-        for idx in range(5):
+        for idx in range(len(counts)):
             test_depth = idx + 1
             agentUT, board = self.initAUT(test_depth, heuristic,
                                           iterative_search, method,
@@ -450,7 +450,7 @@ class Project1Test(unittest.TestCase):
         # the search should still return an optimal move.
         counts = [(8, 8), (17, 10), (74, 42), (139, 51), (540, 119)]
 
-        for idx in range(1):
+        for idx in range(len(counts)):
             test_depth = idx + 1  # pruning guarantee requires min depth of 3
             first_branch = []
             heuristic = makeBranchEval(first_branch)
