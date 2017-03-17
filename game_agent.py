@@ -200,21 +200,20 @@ class CustomPlayer:
         legal_moves = game.get_legal_moves(game.active_player)
 
         if len(legal_moves) == 0:
-                    return (float("-inf"), (-1, -1))
+            return (float("-inf"), (-1, -1))
 
         if depth == 0:
             return (self.score(game, player_scored), legal_moves[0])
 
-        else:
-            best_move = legal_moves[0]
-            new_game = game.forecast_move(best_move)
-            best_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
-            for current_move in legal_moves[1:]:
-                new_game = game.forecast_move(current_move)
-                current_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
-                if (current_val > best_val) == maximizing_player:
-                    best_val = current_val
-                    best_move = current_move
+        best_move = legal_moves[0]
+        new_game = game.forecast_move(best_move)
+        best_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+        for current_move in legal_moves[1:]:
+            new_game = game.forecast_move(current_move)
+            current_val, _ = self.minimax(new_game, depth-1, maximizing_player=(not maximizing_player))
+            if (current_val > best_val) == maximizing_player:
+                best_val = current_val
+                best_move = current_move
 
         return (best_val, best_move)
 
@@ -270,31 +269,30 @@ class CustomPlayer:
         # print("num of legal_moves {}".format(len(legal_moves)))
         # print("legal moves {}".format(legal_moves))
         if len(legal_moves) == 0:
-                    return (float("-inf"), (-1, -1))
+            return (float("-inf"), (-1, -1))
 
         if depth == 0:
             return (self.score(game, player_scored), legal_moves[0])
 
-        else:
-            best_move = legal_moves[0]
-            new_game = game.forecast_move(best_move)
-            best_val, _ = self.alphabeta(new_game, depth-1, maximizing_player=(not maximizing_player))
+        best_move = legal_moves[0]
+        new_game = game.forecast_move(best_move)
+        best_val, _ = self.alphabeta(new_game, depth-1, maximizing_player=(not maximizing_player))
 
-            for current_move in legal_moves[1:]:
+        for current_move in legal_moves[1:]:
 
-                if (maximizing_player and (best_val >= beta)) or (not maximizing_player and (best_val <= alpha)):
-                    break
+            if (maximizing_player and (best_val >= beta)) or (not maximizing_player and (best_val <= alpha)):
+                break
 
-                if maximizing_player:
-                    alpha = best_val
+            if maximizing_player:
+                alpha = best_val
 
-                else:
-                    beta = best_val
+            else:
+                beta = best_val
 
-                new_game = game.forecast_move(current_move)
-                current_val, _ = self.alphabeta(new_game, depth-1, alpha=alpha, beta=beta, maximizing_player=(not maximizing_player))
-                if (current_val > best_val) == maximizing_player:
-                    best_val = current_val
-                    best_move = current_move
+            new_game = game.forecast_move(current_move)
+            current_val, _ = self.alphabeta(new_game, depth-1, alpha=alpha, beta=beta, maximizing_player=(not maximizing_player))
+            if (current_val > best_val) == maximizing_player:
+                best_val = current_val
+                best_move = current_move
 
         return (best_val, best_move)
