@@ -36,6 +36,11 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
 
     return float(len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player))))
 
@@ -193,7 +198,7 @@ class CustomPlayer:
                 evaluation function directly.
         """
         #  get first value
-        if self.time_left() < self.TIMER_THRESHOLD:
+        if self.time_left() <= self.TIMER_THRESHOLD:
             raise Timeout()
 
         player_scored = game.active_player if maximizing_player else game.inactive_player
@@ -255,19 +260,12 @@ class CustomPlayer:
                 to pass the project unit tests; you cannot call any other
                 evaluation function directly.
         """
-        if self.time_left() < self.TIMER_THRESHOLD:
+        if self.time_left() <= self.TIMER_THRESHOLD:
             raise Timeout()
 
         player_scored = game.active_player if maximizing_player else game.inactive_player
-        # opponent = game.get_opponent(player_scored)
         legal_moves = game.get_legal_moves(game.active_player)
 
-        # print("---" * 10)
-        # print("at level {}".format(depth))
-        # print("my current position: {}".format(game.get_player_location(player_scored)))
-        # print("opponent current position: {}".format(game.get_player_location(opponent)))
-        # print("num of legal_moves {}".format(len(legal_moves)))
-        # print("legal moves {}".format(legal_moves))
         if len(legal_moves) == 0:
             return (float("-inf"), (-1, -1))
 
