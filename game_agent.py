@@ -7,6 +7,7 @@ You must test your agent's strength against a set of agents with known
 relative strength using tournament.py and include the results in your report.
 """
 import random
+from math import sqrt
 
 
 class Timeout(Exception):
@@ -42,7 +43,87 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return float(len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player))))
+    improved_score = len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player)))  # range(-7 ~ 7)
+
+    if len(game.get_blank_spaces()) >= 32:
+        player_location = game.get_player_location(player)
+        margin_dist = sqrt((player_location[0] - 3) ** 2 + (player_location[1] - 3) ** 2)  # range(0 ~ 4.24)
+        return float(improved_score + (-0.5 * margin_dist))
+    else:
+        return float(improved_score)
+
+
+def custom_score_mid_dist(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    player_location = game.get_player_location(player)
+    improved_score = len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player)))  # range(-7 ~ 7)
+    margin_dist = sqrt((player_location[0] - 3) ** 2 + (player_location[1] - 3) ** 2)  # range(0 ~ -6)
+
+    return float(improved_score + (-1 * margin_dist))
+
+
+def custom_score_early_phase_mid_dist(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    improved_score = len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player)))  # range(-7 ~ 7)
+
+    if len(game.get_blank_spaces()) >= 32:
+        player_location = game.get_player_location(player)
+        margin_dist = sqrt((player_location[0] - 3) ** 2 + (player_location[1] - 3) ** 2)  # range(0 ~ 4.24)
+        return float(improved_score + (-1 * margin_dist))
+    else:
+        return float(improved_score)
 
 
 class CustomPlayer:
